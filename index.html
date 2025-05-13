@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Desafio da Cobra Baiana</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px #ff4d4d;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #ff4d4d;
+            }
+
+            100% {
+                box-shadow: 0 0 5px #ff4d4d;
+            }
+        }
+
+        body {
+            margin: 0;
+            background: #000 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Imagem de fundo do Elevador Lacerda */
+        body::before {
+            content: "";
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background: url('elevador-lacerda.jpg') center center no-repeat;
+            background-size: cover;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        #gameContainer {
+            position: relative;
+            box-shadow: 0 0 50px rgba(255, 77, 77, 0.3);
+            border-radius: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            animation: glow 2s infinite;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        canvas {
+            border: 2px solid rgba(255, 77, 77, 0.5);
+            border-radius: 15px;
+            background: #000000;
+        }
+
+        .menu {
+            backdrop-filter: blur(15px);
+            background: rgba(26, 15, 60, 0.95);
+            border: 2px solid rgba(255, 77, 77, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .menu,
+        #mainMenu.menu {
+            width: 1200px;
+            min-width: 1800px;
+            max-width: 1800px;
+            height: 1200px;
+            min-height: 1200px;
+            max-height: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .menu.main-menu-custom {
+            width: 1200px;
+            min-width: 1200px;
+            max-width: 1200px;
+            height: 1800px;
+            min-height: 1800px;
+            max-height: 1800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .menu.main-menu-custom {
+            width: 1800px;
+            min-width: 1800px;
+            max-width: 1800px;
+            height: 1800px;
+            min-height: 1800px;
+            max-height: 1800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff4d4d, #ff8400);
+            border: none;
+            padding: 12px 25px;
+            margin: 8px;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+            min-width: 200px;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #ff8400, #ff4d4d);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(248, 54, 0, 0.3);
+        }
+
+        .menu input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            margin: 15px 0;
+            border-radius: 25px;
+            color: white;
+            width: 250px;
+            font-size: 16px;
+            transition: all 0.3s;
+            text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+        }
+
+        .menu input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ff4d4d;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.3);
+        }
+
+        #ranking {
+            background: rgba(26, 15, 60, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 77, 77, 0.3);
+            transition: all 0.3s;
+        }
+
+        #ranking h3 {
+            color: #ff8400;
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #topPlayers {
+            padding-left: 20px;
+        }
+
+        #topPlayers li {
+            margin: 8px 0;
+            font-size: 14px;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        #topPlayers li:hover {
+            transform: scale(1.05);
+            background: rgba(255, 77, 77, 0.2);
+        }
+
+        .score {
+            background: linear-gradient(45deg, rgba(26, 15, 60, 0.95), rgba(75, 31, 110, 0.95));
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-size: 28px;
+            letter-spacing: 2px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        h1 {
+            background: linear-gradient(45deg, #ff4d4d, #f83600);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
+            animation: glow 2s infinite;
+        }
+
+        h3 {
+            color: #ff8400;
+            font-size: 1.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+    <!-- Load core game files first -->
+    <script src="game.js"></script>
+</head>
+
+<body>
+    <script>
+        // Limpa o localStorage ao carregar a página
+        window.localStorage.clear();
+    </script>
+    <div id="gameContainer"
+        style="background: #000; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
+        <div id="score" class="score score-fixed">Pontos: 0</div>
+        <canvas id="gameCanvas" width="1800" height="1000"
+            style="margin-top:60px; display:none; max-width:98vw; max-height:90vh;"></canvas>
+        <!-- Botões analógicos para mobile -->
+        <div id="mobileControls"
+            style="display:none;position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:999;">
+            <div style="display:flex;flex-direction:column;align-items:center;">
+                <button id="btnUp"
+                    style="width:70px;height:70px;border-radius:50%;margin-bottom:10px;font-size:2em;opacity:0.85;">▲</button>
+                <div style="display:flex;flex-direction:row;align-items:center;">
+                    <button id="btnLeft"
+                        style="width:70px;height:70px;border-radius:50%;margin-right:30px;font-size:2em;opacity:0.85;">◀</button>
+                    <button id="btnDown"
+                        style="width:70px;height:70px;border-radius:50%;margin-right:0;margin-left:0;font-size:2em;opacity:0.85;">▼</button>
+                    <button id="btnRight"
+                        style="width:70px;height:70px;border-radius:50%;margin-left:30px;font-size:2em;opacity:0.85;">▶</button>
+                </div>
+            </div>
+        </div>
+        <div id="mainMenu" class="menu main-menu-custom" style="display: flex;">
+            <h1>Desafio da Cobra Baiana</h1>
+            <div
+                style="background:rgba(0,0,0,0.18);border-radius:12px;padding:18px 18px 10px 18px;margin-bottom:18px;max-width:90%;font-size:1.15em;text-align:left;">
+                <b>Como jogar:</b>
+                <ul style="margin:10px 0 0 18px;padding:0 0 0 0.5em;">
+                    <li>Use as <b>setas</b> ou <b>WASD</b> para mover a cobra.</li>
+                    <li>Coma as comidas para ganhar pontos e crescer.</li>
+                    <li>Evite bater nos obstáculos, no próprio corpo ou no bot "DENDE".</li>
+                    <li>Pressione <b>P</b> para pausar/continuar.</li>
+                    <li>Ao atingir a meta de pontos do nível, você vence!</li>
+                    <li>Se perder, volte ao menu para tentar novamente.</li>
+                </ul>
+                <div style="margin-top:18px;font-size:1.08em;">
+                    <b>Meta para ganhar o prêmio:</b>
+                    <ul style="margin:8px 0 0 18px;padding:0 0 0 0.5em;">
+                        <li><b>Tranquilo:</b> faça <b>100 pontos</b> para ganhar o prêmio!</li>
+                        <li><b>Esquentando:</b> faça <b>80 pontos</b> para ganhar o prêmio!</li>
+                        <li><b>Apimentado:</b> faça <b>30 pontos</b> para ganhar o prêmio!</li>
+                    </ul>
+                </div>
+                <div style="margin-top:18px;font-size:1.08em;">
+                    <b>Comidas do jogo:</b>
+                    <ul style="margin:8px 0 0 18px;padding:0 0 0 0.5em;">
+                        <li><span style="color:lime;font-weight:bold;">Salada</span> (verde): comida normal (+5 pontos)
+                        </li>
+                        <li><span style="color:#ffe066;font-weight:bold;">Vatapá</span> (amarelo): comida especial (+10
+                            pontos)</li>
+                        <li><span style="color:#3c8c3c;font-weight:bold;">Caruru</span> (verde escuro): comida especial
+                            (+15 pontos)</li>
+                        <li><span style="color:red;font-weight:bold;">Pimenta</span>: comida especial (+20 pontos, mais
+                            comida)</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="nameInfo" style="color:#ffeb3b;font-size:1.2em;margin-bottom:10px;display:none;">
+                Digite seu nome para iniciar o jogo!
+            </div>
+            <label for="playerName" class="menu-label">Digite seu nome</label>
+            <input type="text" id="playerName" placeholder="Digite seu nome" class="menu-input" autocomplete="off">
+            <h3 class="menu-niveis">Níveis:</h3>
+            <div id="levelButtons" class="menu-level-buttons">
+                <button type="button" data-level="easy" onclick="selectLevel('easy', this)">Tranquilo</button>
+                <button type="button" data-level="medium" onclick="selectLevel('medium', this)">Esquentando</button>
+                <button type="button" data-level="hard" onclick="selectLevel('hard', this)">Apimentado</button>
+            </div>
+            <div id="selectedLevelInfo" style="margin-bottom:10px;font-size:1.15em;color:#ff8400;min-height:28px;">
+            </div>
+            <button id="startGameBtn" onclick="window.startGame()" disabled>Iniciar Jogo</button>
+        </div>
+    </div>
+    <script>
+        // Destaca o botão selecionado e habilita o botão de iniciar
+        window.selectedLevel = null;
+        function selectLevel(level, btn) {
+            window.selectedLevel = level;
+            document.querySelectorAll('#levelButtons button').forEach(b => b.style.outline = '');
+            btn.style.outline = '3px solid #ff8400';
+            // Mostra o nível selecionado
+            const info = document.getElementById('selectedLevelInfo');
+            let txt = '';
+            if (level === 'easy') txt = 'Nível selecionado: <b>Tranquilo</b>';
+            else if (level === 'medium') txt = 'Nível selecionado: <b>Esquentando</b>';
+            else if (level === 'hard') txt = 'Nível selecionado: <b>Apimentado</b>';
+            info.innerHTML = txt;
+            // Só habilita se o nome estiver preenchido
+            document.getElementById('startGameBtn').disabled = !document.getElementById('playerName').value.trim();
+        }
+        // Habilita o botão ao digitar o nome e mostra aviso se vazio
+        document.addEventListener('DOMContentLoaded', function () {
+            const nameInput = document.getElementById('playerName');
+            const nameInfo = document.getElementById('nameInfo');
+            nameInput.addEventListener('input', function () {
+                const hasName = this.value.trim();
+                document.getElementById('startGameBtn').disabled = !(window.selectedLevel && hasName);
+                nameInfo.style.display = hasName ? 'none' : 'block';
+            });
+            // Mostra aviso se o campo estiver vazio ao carregar
+            if (!nameInput.value.trim()) nameInfo.style.display = 'block';
+        });
+        // Ao iniciar o jogo, esconde o menu e mostra o canvas
+        window.startGame = function () {
+            const menu = document.getElementById('mainMenu');
+            const canvas = document.getElementById('gameCanvas');
+            // DEBUG extra: mostra o tipo de window.game e se o método existe
+            console.log("startGame HTML chamado", typeof window.game, window.game, window.selectedLevel);
+            if (!window.game) {
+                // Tenta forçar a criação do jogo se não existir
+                if (typeof SnakeGame === 'function') {
+                    window.game = new SnakeGame();
+                    console.log("SnakeGame criado manualmente pelo HTML");
+                }
+            }
+            if (menu) menu.style.display = 'none';
+            if (canvas) canvas.style.display = 'block';
+            if (window.game && typeof window.game.init === 'function') {
+                window.game.init(window.selectedLevel);
+            } else {
+                alert("O jogo não foi carregado corretamente. Recarregue a página.");
+            }
+            if (isMobile()) {
+                showMobileControls(true);
+            } else {
+                showMobileControls(false);
+            }
+        }
+        // Detecta se é mobile e mostra controles analógicos
+        function isMobile() {
+            return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+        }
+        function showMobileControls(show) {
+            var el = document.getElementById('mobileControls');
+            if (el) el.style.display = show ? 'block' : 'none';
+        }
+
+        // Adiciona eventos aos botões analógicos
+        function setupMobileControls() {
+            const btnUp = document.getElementById('btnUp');
+            const btnDown = document.getElementById('btnDown');
+            const btnLeft = document.getElementById('btnLeft');
+            const btnRight = document.getElementById('btnRight');
+            if (!btnUp) return;
+            btnUp.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('up'); });
+            btnDown.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('down'); });
+            btnLeft.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('left'); });
+            btnRight.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('right'); });
+            // Também suporta clique para desktop/mobile híbrido
+            btnUp.addEventListener('click', function () { setDirection('up'); });
+            btnDown.addEventListener('click', function () { setDirection('down'); });
+            btnLeft.addEventListener('click', function () { setDirection('left'); });
+            btnRight.addEventListener('click', function () { setDirection('right'); });
+        }
+        function setDirection(dir) {
+            if (window.game && window.game.gameActive) {
+                // Só muda se não for direção oposta
+                if (dir === 'up' && window.game.direction !== 'down') window.game.nextDirection = 'up';
+                if (dir === 'down' && window.game.direction !== 'up') window.game.nextDirection = 'down';
+                if (dir === 'left' && window.game.direction !== 'right') window.game.nextDirection = 'left';
+                if (dir === 'right' && window.game.direction !== 'left') window.game.nextDirection = 'right';
+            }
+        }
+
+        // Mostra controles ao iniciar o jogo se for mobile
+        const originalStartGame = window.startGame;
+        window.startGame = function () {
+            if (isMobile()) {
+                showMobileControls(true);
+            } else {
+                showMobileControls(false);
+            }
+            originalStartGame();
+        };
+
+        // Esconde controles ao voltar pro menu
+        function hideMobileControlsOnMenu() {
+            showMobileControls(false);
+        }
+        // Chame ao voltar pro menu (ajuste no game.js se necessário)
+        document.addEventListener('DOMContentLoaded', function () {
+            setupMobileControls();
+            if (!isMobile()) showMobileControls(false);
+        });
+    </script>
+</body>
+
+</html>
