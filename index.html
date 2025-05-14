@@ -267,23 +267,35 @@
         window.localStorage.clear();
     </script>
     <div id="gameContainer"
-        style="background: #000; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
+        style="background: #000; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position:relative;">
         <div id="score" class="score score-fixed">Pontos: 0</div>
         <canvas id="gameCanvas" width="1800" height="1000"
             style="margin-top:60px; display:none; max-width:98vw; max-height:90vh;"></canvas>
         <!-- Botões analógicos para mobile -->
         <div id="mobileControls"
-            style="display:none;position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:999;">
-            <div style="display:flex;flex-direction:column;align-items:center;">
-                <button id="btnUp"
-                    style="width:70px;height:70px;border-radius:50%;margin-bottom:10px;font-size:2em;opacity:0.85;">▲</button>
-                <div style="display:flex;flex-direction:row;align-items:center;">
+            style="display:none;position:absolute;left:0;top:0;width:100%;height:100%;z-index:20;pointer-events:none;">
+            <div
+                style="position:absolute;left:2vw;bottom:4vw;display:flex;flex-direction:column;align-items:center;pointer-events:none;">
+                <!-- D-Pad -->
+                <div style="position:relative;width:120px;height:120px;">
+                    <button id="btnUp"
+                        style="position:absolute;left:38px;top:0;width:44px;height:44px;opacity:0.5;background:rgba(0,0,0,0.18);color:#fff;border:none;border-radius:12px;font-size:2em;pointer-events:auto;">▲</button>
                     <button id="btnLeft"
-                        style="width:70px;height:70px;border-radius:50%;margin-right:30px;font-size:2em;opacity:0.85;">◀</button>
+                        style="position:absolute;left:0;top:38px;width:44px;height:44px;opacity:0.5;background:rgba(0,0,0,0.18);color:#fff;border:none;border-radius:12px;font-size:2em;pointer-events:auto;">◀</button>
                     <button id="btnDown"
-                        style="width:70px;height:70px;border-radius:50%;margin-right:0;margin-left:0;font-size:2em;opacity:0.85;">▼</button>
+                        style="position:absolute;left:38px;top:76px;width:44px;height:44px;opacity:0.5;background:rgba(0,0,0,0.18);color:#fff;border:none;border-radius:12px;font-size:2em;pointer-events:auto;">▼</button>
                     <button id="btnRight"
-                        style="width:70px;height:70px;border-radius:50%;margin-left:30px;font-size:2em;opacity:0.85;">▶</button>
+                        style="position:absolute;left:76px;top:38px;width:44px;height:44px;opacity:0.5;background:rgba(0,0,0,0.18);color:#fff;border:none;border-radius:12px;font-size:2em;pointer-events:auto;">▶</button>
+                </div>
+            </div>
+            <div
+                style="position:absolute;right:2vw;bottom:4vw;display:flex;flex-direction:column;align-items:center;pointer-events:none;">
+                <!-- Start e Pause -->
+                <div style="display:flex;flex-direction:row;gap:18px;">
+                    <button id="btnPause"
+                        style="width:70px;height:38px;opacity:0.5;background:rgba(0,0,0,0.18);color:#fff;border:none;border-radius:10px;font-size:1.3em;pointer-events:auto;">PAUSE</button>
+                    <button id="btnStart"
+                        style="width:70px;height:38px;opacity:0.5;background:rgba(0,0,0,0.18);color:#fff;border:none;border-radius:10px;font-size:1.3em;pointer-events:auto;">START</button>
                 </div>
             </div>
         </div>
@@ -402,22 +414,33 @@
             if (el) el.style.display = show ? 'block' : 'none';
         }
 
-        // Adiciona eventos aos botões analógicos
+        // Adiciona eventos aos botões analógicos e pause/start mobile
         function setupMobileControls() {
             const btnUp = document.getElementById('btnUp');
             const btnDown = document.getElementById('btnDown');
             const btnLeft = document.getElementById('btnLeft');
             const btnRight = document.getElementById('btnRight');
+            const btnPause = document.getElementById('btnPause');
+            const btnStart = document.getElementById('btnStart');
             if (!btnUp) return;
             btnUp.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('up'); });
             btnDown.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('down'); });
             btnLeft.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('left'); });
             btnRight.addEventListener('touchstart', function (e) { e.preventDefault(); setDirection('right'); });
-            // Também suporta clique para desktop/mobile híbrido
             btnUp.addEventListener('click', function () { setDirection('up'); });
             btnDown.addEventListener('click', function () { setDirection('down'); });
             btnLeft.addEventListener('click', function () { setDirection('left'); });
             btnRight.addEventListener('click', function () { setDirection('right'); });
+            // Pause
+            if (btnPause) {
+                btnPause.addEventListener('touchstart', function (e) { e.preventDefault(); triggerPause(); });
+                btnPause.addEventListener('click', function () { triggerPause(); });
+            }
+            // Start (simula ENTER para game over/vitória)
+            if (btnStart) {
+                btnStart.addEventListener('touchstart', function (e) { e.preventDefault(); triggerEnter(); });
+                btnStart.addEventListener('click', function () { triggerEnter(); });
+            }
         }
         function setDirection(dir) {
             if (window.game && window.game.gameActive) {
@@ -427,6 +450,16 @@
                 if (dir === 'left' && window.game.direction !== 'right') window.game.nextDirection = 'left';
                 if (dir === 'right' && window.game.direction !== 'left') window.game.nextDirection = 'right';
             }
+        }
+        function triggerPause() {
+            if (window.game && typeof window.game.togglePause === 'function') {
+                window.game.togglePause();
+            }
+        }
+        function triggerEnter() {
+            // Simula pressionar ENTER (para game over/vitória)
+            const evt = new KeyboardEvent('keydown', { key: 'Enter' });
+            document.dispatchEvent(evt);
         }
 
         // Mostra controles ao iniciar o jogo se for mobile
